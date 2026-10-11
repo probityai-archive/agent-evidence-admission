@@ -27,3 +27,15 @@ It exits 1 with `FAIL digest-mismatch` when the bytes differ, or `FAIL no-digest
 ## Status
 
 Version 0.1.0. The Kubernetes admission policies (Rego, Kyverno, policy-controller) live in the same repository; see the [repository README](https://github.com/probityai/agent-evidence-admission#readme).
+
+## Build packages
+
+From the repository root, check the license copy, build both archives and check their license text and metadata:
+
+```bash
+python scripts/python-license-gate.py
+python -m build python --outdir dist
+python scripts/python-license-gate.py --dist dist
+```
+
+The repository `LICENSE` is the source of the existing Apache-2.0 grant. `python/LICENSE` is its byte-for-byte distribution copy because license-file paths must stay within the Python project. Copy the root file when it changes; the gate refuses drift. Both the wheel and source archive include that text, and the source archive can build without the repository parent.

@@ -9,6 +9,9 @@ description = "Check that an artifact has the digest its compliance document, SB
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
+# Distribution copy of the repository LICENSE; scripts/python-license-gate.py
+# refuses copy drift before CI builds or installs the package.
+license-files = ["LICENSE"]
 authors = [{ name = "Sankalp Gilda" }]
 classifiers = [
     "Programming Language :: Python :: 3",
