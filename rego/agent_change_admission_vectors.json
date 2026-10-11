@@ -1,5 +1,6 @@
 {
   "agent_change_admission_vectors": {
+    "candidate_digest": "ff7219b82f46ae2e56711f770467c629c41e221b692a25bb4b11ab80eb7bbc3a",
     "cases": {
       "admitted-with-failed-gate": {
         "consumer": {
@@ -1618,6 +1619,7 @@
         ]
       }
     },
+    "image_digest": "77e841f14bf202be78921777a52464a91647a3fc216c22f15f5cbf5d6482690e",
     "issuer_keyid": "7243f5d7c11972ef945393f906f650a2e194870542096704f104e039792028f9",
     "issuer_public_key_b64": "v85NvAeK5MiML36HY6PRNAdgth+LiiR3sv48sNEyPVk=",
     "predicate_type": "https://github.com/probityai/agent-evidence-vocabulary/blob/main/docs/predicates/agent-change-admission-v1.md",

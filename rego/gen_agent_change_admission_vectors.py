@@ -461,6 +461,8 @@ def cases() -> list[dict[str, Any]]:
 def render() -> str:
     doc = {
         "agent_change_admission_vectors": {
+            "candidate_digest": CANDIDATE_DIGEST,
+            "image_digest": IMAGE_DIGEST,
             "predicate_type": PREDICATE_URI,
             "issuer_keyid": keyid(SIGNER),
             "issuer_public_key_b64": public_b64(SIGNER),
