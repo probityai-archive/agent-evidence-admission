@@ -150,6 +150,47 @@ jobs:
       - name: the deployed manifest still embeds the module verbatim
         run: python3 policy-controller/gen_soundness_cip.py --check
 
+  change-admission:
+    # The agent change admission rule set: one rego module, its Kyverno CEL policy
+    # and its generated policy-controller manifest, held to one vector file. The
+    # vectors regenerate byte for byte from their generator, the manifest embeds
+    # the module, every rail returns the reference answer on every vector, and
+    # deleting any single refusal rule turns the module's own tests red.
+    name: change admission rails
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: install opa
+        run: |
+          set -euo pipefail
+          curl -sSfL -o /tmp/opa \
+            "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64_static"
+          echo "${OPA_SHA256}  /tmp/opa" | sha256sum -c -
+          chmod +x /tmp/opa
+          sudo mv /tmp/opa /usr/local/bin/opa
+      - name: install the kyverno cli
+        run: |
+          set -euo pipefail
+          curl -sSfL -o /tmp/kyverno.tar.gz \
+            "https://github.com/kyverno/kyverno/releases/download/${KYVERNO_VERSION}/kyverno-cli_${KYVERNO_VERSION}_linux_x86_64.tar.gz"
+          echo "${KYVERNO_SHA256}  /tmp/kyverno.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/kyverno.tar.gz -C /tmp kyverno
+          sudo mv /tmp/kyverno /usr/local/bin/kyverno
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.13"
+      - name: install the signing library the vector generator uses
+        run: python3 -m pip install cryptography==50.0.2
+      - name: the vectors are what the generator writes
+        run: python3 rego/gen_agent_change_admission_vectors.py --check
+      - name: the deployed manifest embeds the module
+        run: python3 policy-controller/gen_change_admission_cip.py --check
+      - name: the module's own tests
+        run: opa test --timeout 300s rego/
+      - name: every rail agrees on every vector and every refusal rule is load-bearing
+        run: python3 conformance/run_change_admission_conformance.py
+
   rails:
     name: every rail over the pinned corpus
     runs-on: ubuntu-latest
