@@ -1,16 +1,44 @@
 # agent-evidence-admission
 
-Admission policies that let a Kubernetes cluster admit or refuse a workload on its adversarial
-execution evidence: a Rego oracle for OPA, Kyverno policies on the JMESPath and CEL rails, and
-sigstore policy-controller policies.
+Admission checks for artifact bytes and workload evidence: a Python digest checker plus OPA,
+Kyverno and sigstore policy-controller policies.
 
-It's for platform and security engineers who already run one of those engines and want a workload
-to show what was tested against it before the cluster admits it, with a measured map of which
-specification obligations each engine enforces.
+For integrators who bind a document to release bytes, and platform engineers who gate workloads
+on declared execution evidence.
+
+## Check an artifact digest
+
+Start in a new directory with Python 3.10 or newer and [uv](https://github.com/astral-sh/uv).
+Install the checker in its own environment, then check a synthetic in-toto statement:
+
+```sh
+uv venv admission-env
+uv pip install --python admission-env/bin/python agent-evidence-admission==0.1.0
+printf 'abc' > artifact.txt
+cat > statement.json <<'JSON'
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [{"name": "artifact.txt", "digest": {"sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}}],
+  "predicateType": "https://example.org/digest-demo/v1",
+  "predicate": {}
+}
+JSON
+admission-env/bin/agent-evidence-admission digest-check statement.json artifact.txt
+```
+
+It prints:
+
+```text
+PASS artifact.txt has sha256:ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad, named in statement.json
+```
+
+Exit 0 means a named digest matches. Exit 1 means a mismatch or no named digest; exit 2 means a read error.
+A match binds the document to bytes. It does not verify a signature or admit a workload.
+See the [package guide](https://github.com/probityai/agent-evidence-admission/blob/main/python/README.md) for supported documents.
 
 ## Quick start
 
-Pin the policies to a commit and evaluate the sample statement with OPA:
+For Kubernetes, pin the policies to a commit and evaluate the sample statement with OPA:
 
 ```bash
 git clone https://github.com/probityai/agent-evidence-admission && cd agent-evidence-admission
@@ -39,6 +67,7 @@ It prints `true`. `opa test --timeout 120s rego/` runs the oracle's own test sui
 
 ## Status
 
+The Python digest checker is version 0.1.0.
 The policies follow the in-toto Adversarial Execution Evidence predicate v0.7, proposed in
 [in-toto/attestation#570](https://github.com/in-toto/attestation/pull/570). The profile registry
 measures them against the [agent-evidence-vectors](https://github.com/probityai/agent-evidence-vectors) corpus

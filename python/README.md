@@ -6,11 +6,40 @@ It is for manufacturers, integrators and admission controllers that receive a co
 
 ## Install
 
-```bash
-pip install agent-evidence-admission==0.1.0
+Start in a new directory with Python 3.10 or newer and [uv](https://github.com/astral-sh/uv).
+Install the checker in its own environment:
+
+```sh
+uv venv admission-env
+uv pip install --python admission-env/bin/python agent-evidence-admission==0.1.0
 ```
 
 ## Example
+
+Create three known bytes and a synthetic in-toto statement that names their digest:
+
+```sh
+printf 'abc' > artifact.txt
+cat > statement.json <<'JSON'
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [{"name": "artifact.txt", "digest": {"sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}}],
+  "predicateType": "https://example.org/digest-demo/v1",
+  "predicate": {}
+}
+JSON
+admission-env/bin/agent-evidence-admission digest-check statement.json artifact.txt
+```
+
+It prints:
+
+```text
+PASS artifact.txt has sha256:ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad, named in statement.json
+```
+
+A match binds the document to bytes. It does not verify a signature or admit a workload.
+
+For an existing CycloneDX SBOM and JAR, provide both files in your working directory:
 
 ```bash
 uvx agent-evidence-admission==0.1.0 digest-check bom.json log4j-core-2.26.1.jar
