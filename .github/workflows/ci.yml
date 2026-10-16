@@ -16,13 +16,14 @@ permissions:
   contents: read
 
 env:
-  # The corpus these rails are measured against, pinned by tag AND by the commit
-  # that tag resolved to when this pin was written. A tag is a moving reference
-  # until someone promises otherwise, and a workflow that trusts one has vendored
-  # a promise rather than a corpus.
-  VECTORS_REPO: https://github.com/probityai/agent-evidence-vectors.git
-  VECTORS_TAG: v0.10.1
-  VECTORS_COMMIT: 93deb470a6d44bfa53cdc2ebfd4fc725e2a21e2b
+  # The corpus these rails are measured against, installed the way any consumer
+  # gets it: the published agent-evidence-vectors package from PyPI, pinned by
+  # version AND by the SHA-256 of its wheel, and then held to the corpus digest
+  # the vendored registry records. That release ships the AEE corpus of tag
+  # v0.10.1 unchanged (same corpus digest), so the projection is the same bytes.
+  VECTORS_PACKAGE: agent-evidence-vectors==0.12.1
+  VECTORS_WHEEL_SHA256: 9b9e7371feff06d96657cd8116150d394211ea639275f35d71461857bb4b0d8d
+  VECTORS_CORPUS_DIGEST: 8b035678def9e5ac00ba761b8c640e4412c57163134afb9d2c1a90f49d573a52
 
   # Engine versions, each with the SHA-256 of the release asset. An unpinned
   # engine turns a red build into a question about which binary ran.
@@ -114,17 +115,21 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-      - name: clone the vectors at the pinned tag
+      - name: install the published vectors package at the pinned hash
         run: |
           set -euo pipefail
-          git clone --quiet --depth 1 --branch "$VECTORS_TAG" "$VECTORS_REPO" "$RUNNER_TEMP/vectors"
-          got="$(git -C "$RUNNER_TEMP/vectors" rev-parse HEAD)"
-          if [ "$got" != "$VECTORS_COMMIT" ]; then
-            echo "tag $VECTORS_TAG resolves to $got, not the pinned $VECTORS_COMMIT" >&2
-            echo "A published tag never moves. Either the pin is stale or the tag did." >&2
+          echo "$VECTORS_PACKAGE --hash=sha256:$VECTORS_WHEEL_SHA256" > "$RUNNER_TEMP/vectors.lock"
+          python3 -m pip install --quiet --disable-pip-version-check --no-deps --require-hashes \
+            --only-binary=:all: --python-version 3.13 --target "$RUNNER_TEMP/vectors-pkg" \
+            -r "$RUNNER_TEMP/vectors.lock"
+          corpus="$RUNNER_TEMP/vectors-pkg/agent_evidence_vectors/corpora"
+          got="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["corpusDigest"])' "$corpus/vectors/MANIFEST.json")"
+          if [ "$got" != "$VECTORS_CORPUS_DIGEST" ]; then
+            echo "$VECTORS_PACKAGE ships corpus digest $got, not the pinned $VECTORS_CORPUS_DIGEST" >&2
             exit 1
           fi
-          echo "$VECTORS_TAG is $got, as pinned"
+          ln -s "$corpus" "$RUNNER_TEMP/vectors"
+          echo "$VECTORS_PACKAGE ships corpus $got, as pinned"
       - name: the vendored obligation registry is the corpus registry
         run: python3 scripts/gen_condition_registry.py --check --corpus "$RUNNER_TEMP/vectors"
       - name: the corpus projection re-derives from that corpus
@@ -228,16 +233,21 @@ jobs:
           sudo mv /tmp/cue /usr/local/bin/cue
           cue version
 
-      - name: clone the vectors at the pinned tag
+      - name: install the published vectors package at the pinned hash
         run: |
           set -euo pipefail
-          git clone --quiet --depth 1 --branch "$VECTORS_TAG" "$VECTORS_REPO" "$RUNNER_TEMP/vectors"
-          got="$(git -C "$RUNNER_TEMP/vectors" rev-parse HEAD)"
-          if [ "$got" != "$VECTORS_COMMIT" ]; then
-            echo "tag $VECTORS_TAG resolves to $got, not the pinned $VECTORS_COMMIT" >&2
+          echo "$VECTORS_PACKAGE --hash=sha256:$VECTORS_WHEEL_SHA256" > "$RUNNER_TEMP/vectors.lock"
+          python3 -m pip install --quiet --disable-pip-version-check --no-deps --require-hashes \
+            --only-binary=:all: --python-version 3.13 --target "$RUNNER_TEMP/vectors-pkg" \
+            -r "$RUNNER_TEMP/vectors.lock"
+          corpus="$RUNNER_TEMP/vectors-pkg/agent_evidence_vectors/corpora"
+          got="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["corpusDigest"])' "$corpus/vectors/MANIFEST.json")"
+          if [ "$got" != "$VECTORS_CORPUS_DIGEST" ]; then
+            echo "$VECTORS_PACKAGE ships corpus digest $got, not the pinned $VECTORS_CORPUS_DIGEST" >&2
             exit 1
           fi
-
+          ln -s "$corpus" "$RUNNER_TEMP/vectors"
+          echo "$VECTORS_PACKAGE ships corpus $got, as pinned"
       - name: the vectors these rails will run on are that corpus
         run: |
           set -euo pipefail
