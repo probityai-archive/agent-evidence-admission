@@ -119,8 +119,10 @@ jobs:
         run: |
           set -euo pipefail
           echo "$VECTORS_PACKAGE --hash=sha256:$VECTORS_WHEEL_SHA256" > "$RUNNER_TEMP/vectors.lock"
+          # Only the corpus files are read and nothing from the package is
+          # imported, so the wheel's own interpreter floor does not apply here.
           python3 -m pip install --quiet --disable-pip-version-check --no-deps --require-hashes \
-            --only-binary=:all: --python-version 3.13 --target "$RUNNER_TEMP/vectors-pkg" \
+            --only-binary=:all: --ignore-requires-python --target "$RUNNER_TEMP/vectors-pkg" \
             -r "$RUNNER_TEMP/vectors.lock"
           corpus="$RUNNER_TEMP/vectors-pkg/agent_evidence_vectors/corpora"
           got="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["corpusDigest"])' "$corpus/vectors/MANIFEST.json")"
@@ -237,8 +239,10 @@ jobs:
         run: |
           set -euo pipefail
           echo "$VECTORS_PACKAGE --hash=sha256:$VECTORS_WHEEL_SHA256" > "$RUNNER_TEMP/vectors.lock"
+          # Only the corpus files are read and nothing from the package is
+          # imported, so the wheel's own interpreter floor does not apply here.
           python3 -m pip install --quiet --disable-pip-version-check --no-deps --require-hashes \
-            --only-binary=:all: --python-version 3.13 --target "$RUNNER_TEMP/vectors-pkg" \
+            --only-binary=:all: --ignore-requires-python --target "$RUNNER_TEMP/vectors-pkg" \
             -r "$RUNNER_TEMP/vectors.lock"
           corpus="$RUNNER_TEMP/vectors-pkg/agent_evidence_vectors/corpora"
           got="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["corpusDigest"])' "$corpus/vectors/MANIFEST.json")"
