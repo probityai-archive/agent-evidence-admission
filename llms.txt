@@ -10,8 +10,9 @@
 
 The predicate is `https://in-toto.io/attestation/adversarial-execution-evidence/v0.7`,
 under review at in-toto/attestation#570. The corpus the rails are measured
-against is probityai/agent-evidence-vectors at the tag `v0.10.1`, pinned by tag
-and by commit in `.github/workflows/ci.yml`. These rails evaluate an already
+against is probityai/agent-evidence-vectors at the tag `v0.10.1`, installed in
+`.github/workflows/ci.yml` as the PyPI package `agent-evidence-vectors==0.12.1`
+(same corpus digest), pinned by wheel hash. These rails evaluate an already
 verified statement; the envelope signature is checked by the engine's own key
 authority before any policy body runs. The README says so in its status, and
 docs/DESIGN.md states that ceiling in full.

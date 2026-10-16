@@ -75,6 +75,8 @@ to the tag `v0.10.1` of
 [probityai/agent-evidence-vectors](https://github.com/probityai/agent-evidence-vectors)
 at commit `93deb470a6d44bfa53cdc2ebfd4fc725e2a21e2b`, corpus digest
 `8b035678def9e5ac00ba761b8c640e4412c57163134afb9d2c1a90f49d573a52`. Continuous
-integration clones that tag, refuses a commit that is not the pinned one, and re-derives
-the projection; a projection that no longer reproduces fails the build rather than
-being quietly regenerated.
+integration installs the published `agent-evidence-vectors` 0.12.1 package from PyPI,
+which ships that corpus unchanged, pinned by the SHA-256 of its wheel; it refuses a
+package whose corpus digest is not the pinned one, and re-derives the projection; a
+projection that no longer reproduces fails the build rather than being quietly
+regenerated.
