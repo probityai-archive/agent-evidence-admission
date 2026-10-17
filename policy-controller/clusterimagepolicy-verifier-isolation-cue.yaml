@@ -75,8 +75,22 @@ spec:
               predicate: verifier_isolation!: result!: written_by!: "verifier" // rule: vi-3:result_not_written_by_verifier
               predicate: verifier_isolation!: result!: files_read!: [_] // rule: vi-3:result_source_ambiguous
 
+              // vi-4  V4 Fail-open
+              predicate: verifier_isolation!: tests!: expected!: number & >0 // rule: vi-4:no_tests_expected
+              predicate: verifier_isolation!: tests!: collected!: predicate.verifier_isolation.tests.expected // rule: vi-4:test_count_mismatch
+              predicate: verifier_isolation!: tests!: skipped!: 0 | 0.0 // rule: vi-4:tests_skipped
+              predicate: verifier_isolation!: tests!: exit_status_alone_accepted!: false // rule: vi-4:verdict_from_exit_status_alone
 
+              // vi-5  V5 Sleeper
+              predicate: verifier_isolation!: processes!: worker_killed!: true // rule: vi-5:worker_processes_not_killed
+              predicate: verifier_isolation!: processes!: remaining!: 0 | 0.0 // rule: vi-5:worker_processes_remain
+              predicate: verifier_isolation!: processes!: killed_step!: number & <predicate.verifier_isolation.processes.result_read_step // rule: vi-5:result_read_before_kill
+              predicate: verifier_isolation!: processes!: result_read_step!: number // rule: vi-5:result_read_before_kill
 
+              // vi-6  V6 Staging
+              predicate: verifier_isolation!: staging!: nofollow!: true // rule: vi-6:links_followed
+              predicate: verifier_isolation!: staging!: destination_removed_first!: true // rule: vi-6:destination_not_removed_first
+              predicate: verifier_isolation!: staging!: special_files_rejected!: true // rule: vi-6:special_files_admitted
 
 
 
