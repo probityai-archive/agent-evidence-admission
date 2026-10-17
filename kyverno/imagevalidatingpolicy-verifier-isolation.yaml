@@ -207,3 +207,54 @@ spec:
         && size(variables.result.files_read) == 1
       message: "vi-3:result_source_ambiguous"
 
+    # -- vi-4  V4 Fail-open -------------------------------------------------------
+    - expression: >-
+        has(variables.tests.expected)
+        && (type(variables.tests.expected) == int || type(variables.tests.expected) == double)
+        && double(variables.tests.expected) > 0.0
+      message: "vi-4:no_tests_expected"
+    - expression: >-
+        has(variables.tests.expected)
+        && (type(variables.tests.expected) == int || type(variables.tests.expected) == double)
+        && has(variables.tests.collected)
+        && (type(variables.tests.collected) == int || type(variables.tests.collected) == double)
+        && double(variables.tests.collected) == double(variables.tests.expected)
+      message: "vi-4:test_count_mismatch"
+    - expression: >-
+        has(variables.tests.skipped)
+        && (type(variables.tests.skipped) == int || type(variables.tests.skipped) == double)
+        && double(variables.tests.skipped) == 0.0
+      message: "vi-4:tests_skipped"
+    - expression: >-
+        has(variables.tests.exit_status_alone_accepted)
+        && variables.tests.exit_status_alone_accepted == false
+      message: "vi-4:verdict_from_exit_status_alone"
+
+    # -- vi-5  V5 Sleeper ---------------------------------------------------------
+    - expression: >-
+        has(variables.procs.worker_killed) && variables.procs.worker_killed == true
+      message: "vi-5:worker_processes_not_killed"
+    - expression: >-
+        has(variables.procs.remaining)
+        && (type(variables.procs.remaining) == int || type(variables.procs.remaining) == double)
+        && double(variables.procs.remaining) == 0.0
+      message: "vi-5:worker_processes_remain"
+    - expression: >-
+        has(variables.procs.killed_step)
+        && (type(variables.procs.killed_step) == int || type(variables.procs.killed_step) == double)
+        && has(variables.procs.result_read_step)
+        && (type(variables.procs.result_read_step) == int || type(variables.procs.result_read_step) == double)
+        && double(variables.procs.killed_step) < double(variables.procs.result_read_step)
+      message: "vi-5:result_read_before_kill"
+
+    # -- vi-6  V6 Staging ---------------------------------------------------------
+    - expression: >-
+        has(variables.staging.nofollow) && variables.staging.nofollow == true
+      message: "vi-6:links_followed"
+    - expression: >-
+        has(variables.staging.destination_removed_first) && variables.staging.destination_removed_first == true
+      message: "vi-6:destination_not_removed_first"
+    - expression: >-
+        has(variables.staging.special_files_rejected) && variables.staging.special_files_rejected == true
+      message: "vi-6:special_files_admitted"
+
