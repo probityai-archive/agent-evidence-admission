@@ -27,6 +27,8 @@ HERE = Path(__file__).resolve().parent.parent
 REGISTRY = HERE / "registry" / "conditions.json"
 PROFILES = HERE / "profiles"
 OUT = HERE / "PROFILE-REGISTRY.md"
+FAMILY_REGISTRY = HERE / "registry" / "verifier-isolation.json"
+FAMILY_MAP = HERE / "verifier-isolation" / "PROFILE-MAP.json"
 
 MARK = {"enforced": "enforced", "approximated": "approx", "unreachable": "unreachable"}
 
@@ -140,7 +142,47 @@ def render() -> str:
         "that forces the obligation, which is work in the conformance corpus rather "
         "than work here.\n"
     )
+    lines.extend(render_family())
     return "\n".join(lines)
+
+
+def render_family() -> list[str]:
+    """The verifier isolation family: nine obligations from a second source, one rail."""
+    for path in (FAMILY_REGISTRY, FAMILY_MAP):
+        if not path.is_file():
+            cannot(f"missing {path}")
+    family = json.loads(FAMILY_REGISTRY.read_text(encoding="utf-8"))
+    measured = json.loads(FAMILY_MAP.read_text(encoding="utf-8"))
+    rows = measured["obligations"]
+    out: list[str] = []
+    out.append("\n## The verifier isolation family\n")
+    out.append(
+        f"{len(family['obligations'])} obligations, one rail. These are not conditions of the "
+        f"adversarial-execution-evidence corpus above. Each closes one reward-tampering vector of "
+        f"[terminal-bench issue 2086]({family['source']['url']}), and the family has its own "
+        f"registry (`registry/verifier-isolation.json`), vectors "
+        f"(`rego/verifier_isolation_vectors.json`) and measurement "
+        f"(`verifier-isolation/PROFILE-MAP.json`, written by "
+        f"`conformance/run_verifier_isolation_conformance.py`). "
+        f"[docs/VERIFIER-ISOLATION.md](docs/VERIFIER-ISOLATION.md) says what a report must carry.\n"
+    )
+    out.append(
+        "The `rego` rail is the only rail. The Kyverno and CUE rails do not carry this family, "
+        "and a disposition for a rail that is not here would be a claim nothing measured.\n"
+    )
+    out.append("| obligation | vector | hardening | what it closes | `rego` |")
+    out.append("|---|---|---|---|---|")
+    for ob in family["obligations"]:
+        row = rows[ob["id"]]
+        mark = row["disposition"]
+        if mark == "enforced":
+            mark = f"enforced ({len(row['rules'])} rules, {row['vectors_opening']} vectors)"
+        else:
+            mark = f"{mark} ({row.get('obstruction', 'unnamed')})"
+        steps = ", ".join(ob["hardening"]) or "none"
+        out.append(f"| `{ob['id']}` | {ob['vector']} {ob['name']} | {steps} | {ob['closes']} | {mark} |")
+    out.append("")
+    return out
 
 
 def main(argv: list[str]) -> int:
