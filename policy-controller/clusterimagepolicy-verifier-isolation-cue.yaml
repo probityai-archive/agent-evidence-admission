@@ -57,8 +57,23 @@ spec:
               predicate: verifier_isolation!: contract_sha256!: =~"^[0-9a-f]{64}$" // rule: contract_digest_invalid
               predicate: verifier_isolation!: contract_sha256!: "PIN-ME-REPLACE-WITH-THE-CONTRACT-DIGEST" // rule: contract_digest_mismatch
 
+              // vi-1  V1 Overwrite
+              predicate: verifier_isolation!: trusted_tree!: expected_sha256!: =~"^[0-9a-f]{64}$" // rule: vi-1:trusted_tree_not_reset_to_contract
+              predicate: verifier_isolation!: trusted_tree!: measured_sha256!: predicate.verifier_isolation.trusted_tree.expected_sha256 // rule: vi-1:trusted_tree_not_reset_to_contract
+              predicate: verifier_isolation!: trusted_tree!: excluded_names_reset!: true // rule: vi-1:excluded_names_not_reset
 
+              // vi-2  V2 Patch
+              predicate: verifier_isolation!: worker!: uid!: number & !=0 & !=predicate.verifier_isolation.verifier.uid // rule: vi-2:worker_not_unprivileged
+              predicate: verifier_isolation!: verifier!: uid!: number // rule: vi-2:worker_not_unprivileged
+              predicate: verifier_isolation!: worker!: supplementary_groups!: [] // rule: vi-2:worker_supplementary_groups_kept
+              predicate: verifier_isolation!: verifier!: assertions_in_parent!: true // rule: vi-2:assertions_not_in_parent
+              predicate: verifier_isolation!: verifier!: python_isolated!: true // rule: vi-2:trusted_python_not_isolated
 
+              // vi-3  V3 Reward
+              predicate: verifier_isolation!: result!: dir_mode!: =~"^0?[0-7]00$" // rule: vi-3:result_dir_open_to_worker
+              predicate: verifier_isolation!: result!: precleared!: true // rule: vi-3:result_not_precleared
+              predicate: verifier_isolation!: result!: written_by!: "verifier" // rule: vi-3:result_not_written_by_verifier
+              predicate: verifier_isolation!: result!: files_read!: [_] // rule: vi-3:result_source_ambiguous
 
 
 
