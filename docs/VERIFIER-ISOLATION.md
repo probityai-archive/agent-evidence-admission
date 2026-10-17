@@ -24,12 +24,14 @@ It prints `["vi-3:result_dir_open_to_worker"]`. The same command on `baseline-ad
 
 | path | what it is |
 |---|---|
-| `rego/verifier_isolation.rego` | The rule set, package `verifier_isolation`. |
+| `rego/verifier_isolation.rego` | The rule set, package `verifier_isolation`. The reference. |
+| `kyverno/imagevalidatingpolicy-verifier-isolation.yaml` | The same rules as Kyverno CEL validations. Each one's message is the rego reason it stands for. |
+| `policy-controller/clusterimagepolicy-verifier-isolation-cue.yaml` | The same rules as CUE constraints for policy-controller. Each line ends with `// rule: <reason>`. |
 | `rego/verifier_isolation_vectors.json` | The vectors: a baseline that closes all nine vectors, and cases that each open one fact. Written by `rego/gen_verifier_isolation_vectors.py`; never edit it by hand. |
 | `rego/verifier_isolation_test.rego` | One test per vector, written by the same generator. |
 | `registry/verifier-isolation.json` | The family: the nine obligations, the seven hardening steps and the source capture they were read from. |
-| `conformance/run_verifier_isolation_conformance.py` | Measures the family and writes `verifier-isolation/PROFILE-MAP.json`. |
-| `PROFILE-REGISTRY.md` | Renders the family beside the adversarial-execution-evidence obligations. |
+| `conformance/run_verifier_isolation_conformance.py` | Measures the family on all three rails and writes `verifier-isolation/PROFILE-MAP.json`. `conformance/verifier_isolation_rails.py` runs the two engine rails. |
+| `PROFILE-REGISTRY.md` | Renders the family, one column per rail, beside the adversarial-execution-evidence obligations. |
 
 ## The input
 
@@ -86,9 +88,42 @@ The module reads `data.verifier_isolation_consumer`.
 
 The report is the verifier's account of itself. The rules check that the account closes each vector. They do not check that the account is true, and Rego has no signature check. A consumer that needs more than the verifier's word pins an independent observation of the grading run as well. The done receipt's observation record carries the vantage for that.
 
+## Rails
+
+| rail | artifact | what it checks | what it leaves to the engine |
+|---|---|---|---|
+| `rego` | `rego/verifier_isolation.rego` | Every rule, with the signature declared verified by a consumer pin. | The envelope signature. |
+| `kyverno-cel` | `kyverno/imagevalidatingpolicy-verifier-isolation.yaml` | Every rule, as one CEL validation each. | The envelope signature, checked by `verifyAttestationSignatures`, and the image binding. |
+| `cue` | `policy-controller/clusterimagepolicy-verifier-isolation-cue.yaml` | Every rule, as one CUE constraint line each. | The envelope signature, checked against the authority key. |
+
+The two engine rails ship with a `PIN-ME-` contract digest and admit nothing until it is pinned. Deleting the line marked `contract_digest_mismatch` in the CUE policy, or the validation of the same name in the CEL policy, declines the comparison. That is their form of leaving `expected_contract_sha256` unset.
+
+An engine hands a policy a statement it has already verified, so the reference for the two engine rails is the rego module with `signature_verified_upstream` set and the vector's contract pin. The vector `signature-undeclared` is therefore an admit there.
+
+## The CUE gap
+
+The family fails closed on a fact that is absent. CUE under policy-controller cannot. cosign compiles the policy, unifies it with the statement and calls `Validate()` with neither `Final` nor `Concrete` (`pkg/policy/eval.go`, `evaluateCue`). An absent member is then not an error, because the policy's own constraint fills it: a report that leaves out `worker.supplementary_groups`, `evidence_from_worker` or a loader's `safe` is admitted, and so is a statement with no `verifier_isolation` member at all. A member with a wrong value is a conflict and is refused.
+
+`cue vet` is stricter. It reports a required member that is missing and a value that is not concrete, so the `!` markers in the policy make it refuse the omitted forms, and they are kept because they take effect under any evaluator that finalises. The conformance driver runs every vector both ways. `cue vet` is the `cue` verdict. `cue eval`, which unifies and reports conflicts only, is the nearest the command line comes to cosign's reading, and the driver records the vectors it admits that `cue vet` refuses under `cross_rail.policy_controller_gap` in the map. It then requires each of them to omit a fact the baseline carries; a vector that changes a value and is still admitted would be another gap, and fails the run.
+
+Every obligation has a vector of that kind, `report-missing` at least, so no obligation is `enforced` on the `cue` rail: each row reads `unreachable (absent-member-not-denied)` and carries how many of its opening vectors each reading refuses. A deployment that needs the omitted form refused uses the Kyverno CEL policy or the rego rule set. cosign itself is not executed in this repository.
+
 ## How a disposition is measured
 
-`conformance/run_verifier_isolation_conformance.py` runs the module over every vector and compares each answer with the reasons the vector declares. It then deletes each refusal rule in turn and requires the module's own tests to fail. An obligation is `enforced` only when its baseline admits, a vector opens it, the module refuses that vector with a reason for that obligation, and no rule for it survives deletion. Otherwise the row is `unreachable` with the obstruction named. The result is `verifier-isolation/PROFILE-MAP.json`, and without `--write` the committed file must equal the run.
+`conformance/run_verifier_isolation_conformance.py` runs the rego module over every vector and compares each answer with the reasons the vector declares. It then deletes each refusal rule in turn and requires the module's own tests to fail. An obligation is `enforced` on the rego rail only when its baseline admits, a vector opens it, the module refuses that vector with a reason for that obligation, and no rule for it survives deletion.
+
+The engine rails are held to the same vectors. For each vector the rail must return the reference's refusal reasons, less the ones it has no rule for: the CEL rail returns a reason per validation, because the driver also runs each validation as a policy of its own, and the CUE rail returns a verdict. An obligation the rail carries only in part, or not at all, is `unreachable (no-refusal-rule)`, and the vectors for the missing rules must be admitted, which proves the gap is real. For each rule the driver finds a vector that only that rule refuses, deletes the rule, and requires that vector to be admitted. An obligation is `enforced` on an engine rail when it has every rule, no vector that opens it is answered differently, and every rule is load-bearing in that sense. Anything else is `unreachable` with an obstruction from a closed list, which the driver refuses to extend silently:
+
+| obstruction | meaning |
+|---|---|
+| `no-refusal-rule` | The rail has no rule for at least one reason that refuses a report leaving the obligation open. |
+| `no-vector-opens-it` | No vector opens the obligation, so nothing forces the rail either way. |
+| `rule-survives-deletion` | A rule can be deleted and no check turns red. |
+| `module-diverges-from-vector` | The rego module answers a vector with other reasons than the vector declares. |
+| `rail-diverges-from-vector` | An engine rail answers a vector that opens the obligation differently from the reference. |
+| `absent-member-not-denied` | The rail admits a vector that opens the obligation by omitting a fact the baseline carries. |
+
+The result is `verifier-isolation/PROFILE-MAP.json`, with one block per rail, the verdict of every rail on every vector, and a `cross_rail` block that counts the vectors on which each rail gives the reference's verdict. Without `--write` the committed file must equal the run.
 
 ```bash
 python3 rego/gen_verifier_isolation_vectors.py --check
@@ -97,4 +132,4 @@ python3 conformance/run_verifier_isolation_conformance.py
 python3 scripts/gen_profile_registry.py --check
 ```
 
-The rego module is the only rail. The Kyverno and CUE rails do not carry this family.
+The driver needs `opa`, `kyverno` and `cue` on the path, at the versions `.github/workflows/ci.yml` pins.

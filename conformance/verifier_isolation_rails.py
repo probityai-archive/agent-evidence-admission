@@ -186,11 +186,10 @@ class CelRail:
         # `kyverno apply` selects its loader by extension and ignores `.json`, so the
         # resource is JSON content under a `.yaml` name.
         resource = self.work / "resource.yaml"
-        resource.write_text(
-            json.dumps({"apiVersion": f"{CEL_GROUP}/v1", "kind": "Payload", "metadata": {"name": "vector"}, "spec": {"statement": statement}}),
-            encoding="utf-8",
-        )
-        proc = subprocess.run([self.kyverno, "apply", str(policies), "--resource", str(resource)], capture_output=True, text=True, check=False)
+        body = {"apiVersion": f"{CEL_GROUP}/v1", "kind": "Payload", "metadata": {"name": "vector"}, "spec": {"statement": statement}}
+        resource.write_text(json.dumps(body), encoding="utf-8")
+        command = [self.kyverno, "apply", str(policies), "--resource", str(resource)]
+        proc = subprocess.run(command, capture_output=True, text=True, check=False)
         out = proc.stdout + proc.stderr
         if "Applying 0 policy rule(s)" in out or "failed to compile" in out:
             raise CouldNotRun(f"the lifted CEL policy did not run: {out.strip()[:400]}")
