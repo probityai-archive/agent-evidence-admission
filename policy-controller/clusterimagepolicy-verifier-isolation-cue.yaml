@@ -92,5 +92,15 @@ spec:
               predicate: verifier_isolation!: staging!: destination_removed_first!: true // rule: vi-6:destination_not_removed_first
               predicate: verifier_isolation!: staging!: special_files_rejected!: true // rule: vi-6:special_files_admitted
 
+              // vi-7  V7 Forgery
+              predicate: verifier_isolation!: evidence_from_worker!: [] // rule: vi-7:evidence_taken_from_worker
+              predicate: verifier_isolation!: worker!: env_scrubbed!: true // rule: vi-7:environment_not_scrubbed
+              predicate: verifier_isolation!: worker!: scratch_copy!: true // rule: vi-7:no_scratch_copy
 
+              // vi-8  V8 Disclosure
+              predicate: verifier_isolation!: reference!: dir_mode!: =~"^0?[0-7]00$" // rule: vi-8:reference_readable_by_worker
+              predicate: verifier_isolation!: reference!: inside_artifact_dir!: false // rule: vi-8:reference_inside_artifact
 
+              // vi-9  V9 Exploit
+              predicate: verifier_isolation!: loaders!: [_, ...] // rule: vi-9:loaders_undeclared
+              predicate: verifier_isolation!: loaders!: [...{safe!: true}] // rule: vi-9:unsafe_loader
