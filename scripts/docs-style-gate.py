@@ -244,6 +244,23 @@ TRAILER_RE = re.compile(
 )
 
 
+# The one trailer a commit message may carry although its key is a mark: the
+# co-author line GitHub writes for its own dependency bot when a bot pull
+# request is squash merged. It names a GitHub service account, not an
+# assistant, and it is matched as the whole line, byte for byte, so a person
+# or an assistant written as a co-author still refuses. Drop only that line.
+BOT_TRAILERS = frozenset(
+    {
+        "Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+    }
+)
+
+
+def without_bot_trailers(text: str) -> str:
+    """`text` with every line that is exactly a GitHub bot trailer removed."""
+    return "\n".join(line for line in text.splitlines() if line.strip() not in BOT_TRAILERS)
+
+
 def trailers_in(text: str) -> list[str]:
     """Every authorship trailer in `text`, as the line that carries it."""
     return [m.group(0).strip() for m in TRAILER_RE.finditer(text)]
@@ -370,7 +387,7 @@ def check_history() -> int:
         cannot(f"git log failed: {exc}")
     if not messages.strip():
         cannot("git log returned nothing, which is a broken read")
-    if marks_in(messages):
+    if marks_in(without_bot_trailers(messages)):
         print("a commit message or an identity carries an authorship mark")
         failures += 1
     if failures:
@@ -440,6 +457,18 @@ def selftest() -> int:
         cannot("the trailer rule did not fire on its own positive control")
     if trailers_in(f"The rule names {assistant.lower()} so that it can match it."):
         cannot("the trailer rule fired on a mention that begins no line")
+    # The bot trailer allowance, in both directions: the exact line GitHub
+    # writes for its dependency bot passes, and the same key naming a person,
+    # an assistant, or the bot with any other address still refuses.
+    bot = next(iter(BOT_TRAILERS))
+    if marks_in(without_bot_trailers(f"chore(deps): bump x\n\n{bot}\n")):
+        cannot("the bot trailer allowance did not pass the bot's own trailer")
+    for other in (f"Co-authored-by: {assistant} <noreply@example.invalid>",
+                  "Co-authored-by: A Person <person@example.invalid>",
+                  "Co-authored-by: dependabot[bot] <someone@example.invalid>",
+                  f"{bot} {assistant}"):
+        if not marks_in(without_bot_trailers(f"chore: x\n\n{bot}\n{other}\n")):
+            cannot("the bot trailer allowance passed a co-author line that is not the bot's")
     print("selftest: the mark table, the word table, the heading rule and the trailer rule all fire")
     return 0
 
