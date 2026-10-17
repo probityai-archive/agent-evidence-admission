@@ -80,6 +80,7 @@ setting with no safe default.
 
 | page | read it for |
 | --- | --- |
+| [Start a project](https://github.com/new?template_name=evidence-starter&template_owner=probityai) | a template with the evidence packages pinned and the conformance Action in CI |
 | <a name="verify-the-claim-in-four-commands"></a><a name="what-is-here"></a><a name="why-the-rails-are-published"></a><a name="the-trust-ceiling-stated-before-you-rely-on-any-of-it"></a><a name="the-profile-registry"></a><a name="the-adversarial-ratchet"></a><a name="running-the-conformance-harness"></a><a name="continuous-integration"></a><a name="citation-and-provenance"></a>[Design, trust ceiling and evidence](https://github.com/probityai/agent-evidence-admission/blob/main/docs/DESIGN.md) | the file map, the trust ceiling, how each obligation's disposition is measured, and how to re-run the measurement |
 | [Consumer policy](https://github.com/probityai/agent-evidence-admission/blob/main/docs/CONSUMER-POLICY.md) | the pins, what each one decides, and what an absent value means |
 | [Agent change admission](https://github.com/probityai/agent-evidence-admission/blob/main/docs/AGENT-CHANGE-ADMISSION.md) | admit an agent harness version only on a signed decision that admitted it, on OPA, Kyverno CEL and policy-controller |
