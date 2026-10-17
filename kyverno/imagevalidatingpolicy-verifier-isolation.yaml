@@ -157,3 +157,53 @@ spec:
         && variables.report.contract_sha256 == variables.pinnedContract
       message: "contract_digest_mismatch"
 
+    # -- vi-1  V1 Overwrite -------------------------------------------------------
+    - expression: >-
+        has(variables.trusted.expected_sha256)
+        && type(variables.trusted.expected_sha256) == string
+        && variables.trusted.expected_sha256.matches("^[0-9a-f]{64}$")
+        && has(variables.trusted.measured_sha256)
+        && variables.trusted.measured_sha256 == variables.trusted.expected_sha256
+      message: "vi-1:trusted_tree_not_reset_to_contract"
+    - expression: >-
+        has(variables.trusted.excluded_names_reset) && variables.trusted.excluded_names_reset == true
+      message: "vi-1:excluded_names_not_reset"
+
+    # -- vi-2  V2 Patch -----------------------------------------------------------
+    - expression: >-
+        has(variables.worker.uid)
+        && (type(variables.worker.uid) == int || type(variables.worker.uid) == double)
+        && has(variables.verifier.uid)
+        && (type(variables.verifier.uid) == int || type(variables.verifier.uid) == double)
+        && double(variables.worker.uid) != 0.0
+        && double(variables.worker.uid) != double(variables.verifier.uid)
+      message: "vi-2:worker_not_unprivileged"
+    - expression: >-
+        has(variables.worker.supplementary_groups)
+        && type(variables.worker.supplementary_groups) == list
+        && size(variables.worker.supplementary_groups) == 0
+      message: "vi-2:worker_supplementary_groups_kept"
+    - expression: >-
+        has(variables.verifier.assertions_in_parent) && variables.verifier.assertions_in_parent == true
+      message: "vi-2:assertions_not_in_parent"
+    - expression: >-
+        has(variables.verifier.python_isolated) && variables.verifier.python_isolated == true
+      message: "vi-2:trusted_python_not_isolated"
+
+    # -- vi-3  V3 Reward ----------------------------------------------------------
+    # A mode with group and other bits clear: `700`, `0700` and `600` pass, `770` and `777` do not.
+    - expression: >-
+        has(variables.result.dir_mode) && type(variables.result.dir_mode) == string
+        && variables.result.dir_mode.matches("^0?[0-7]00$")
+      message: "vi-3:result_dir_open_to_worker"
+    - expression: >-
+        has(variables.result.precleared) && variables.result.precleared == true
+      message: "vi-3:result_not_precleared"
+    - expression: >-
+        has(variables.result.written_by) && variables.result.written_by == "verifier"
+      message: "vi-3:result_not_written_by_verifier"
+    - expression: >-
+        has(variables.result.files_read) && type(variables.result.files_read) == list
+        && size(variables.result.files_read) == 1
+      message: "vi-3:result_source_ambiguous"
+

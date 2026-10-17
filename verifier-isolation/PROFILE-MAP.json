@@ -4,7 +4,7 @@
     "agree": {
       "cue": 8,
       "cue-policy-controller": 7,
-      "kyverno-cel": 8
+      "kyverno-cel": 26
     },
     "policy_controller_gap": [
       "report-missing"
@@ -141,37 +141,37 @@
       "artifact": "kyverno/imagevalidatingpolicy-verifier-isolation.yaml",
       "obligations": {
         "vi-1": {
-          "disposition": "unreachable",
-          "obstruction": "no-refusal-rule",
-          "rules": [],
-          "rules_missing": [
+          "disposition": "enforced",
+          "rules": [
             "vi-1:excluded_names_not_reset",
             "vi-1:trusted_tree_not_reset_to_contract"
           ],
+          "rules_deleted": 2,
+          "rules_surviving": 0,
           "vectors_opening": 4
         },
         "vi-2": {
-          "disposition": "unreachable",
-          "obstruction": "no-refusal-rule",
-          "rules": [],
-          "rules_missing": [
+          "disposition": "enforced",
+          "rules": [
             "vi-2:assertions_not_in_parent",
             "vi-2:trusted_python_not_isolated",
             "vi-2:worker_not_unprivileged",
             "vi-2:worker_supplementary_groups_kept"
           ],
+          "rules_deleted": 4,
+          "rules_surviving": 0,
           "vectors_opening": 9
         },
         "vi-3": {
-          "disposition": "unreachable",
-          "obstruction": "no-refusal-rule",
-          "rules": [],
-          "rules_missing": [
+          "disposition": "enforced",
+          "rules": [
             "vi-3:result_dir_open_to_worker",
             "vi-3:result_not_precleared",
             "vi-3:result_not_written_by_verifier",
             "vi-3:result_source_ambiguous"
           ],
+          "rules_deleted": 4,
+          "rules_surviving": 0,
           "vectors_opening": 8
         },
         "vi-4": {
@@ -501,24 +501,24 @@
       "report-missing": "refuse",
       "signature-undeclared": "admit",
       "statement-type-wrong": "refuse",
-      "vi1-excluded-names-kept": "admit",
-      "vi1-trusted-tree-differs": "admit",
-      "vi1-trusted-tree-undeclared": "admit",
-      "vi2-assertions-with-submission": "admit",
-      "vi2-flag-is-string": "admit",
-      "vi2-groups-kept": "admit",
-      "vi2-groups-undeclared": "admit",
-      "vi2-python-not-isolated": "admit",
-      "vi2-worker-is-root": "admit",
-      "vi2-worker-is-verifier": "admit",
-      "vi2-worker-uid-string": "admit",
-      "vi3-no-source": "admit",
-      "vi3-not-precleared": "admit",
-      "vi3-result-dir-777": "admit",
-      "vi3-result-dir-group": "admit",
-      "vi3-result-dir-undeclared": "admit",
-      "vi3-two-sources": "admit",
-      "vi3-written-by-worker": "admit",
+      "vi1-excluded-names-kept": "refuse",
+      "vi1-trusted-tree-differs": "refuse",
+      "vi1-trusted-tree-undeclared": "refuse",
+      "vi2-assertions-with-submission": "refuse",
+      "vi2-flag-is-string": "refuse",
+      "vi2-groups-kept": "refuse",
+      "vi2-groups-undeclared": "refuse",
+      "vi2-python-not-isolated": "refuse",
+      "vi2-worker-is-root": "refuse",
+      "vi2-worker-is-verifier": "refuse",
+      "vi2-worker-uid-string": "refuse",
+      "vi3-no-source": "refuse",
+      "vi3-not-precleared": "refuse",
+      "vi3-result-dir-777": "refuse",
+      "vi3-result-dir-group": "refuse",
+      "vi3-result-dir-undeclared": "refuse",
+      "vi3-two-sources": "refuse",
+      "vi3-written-by-worker": "refuse",
       "vi4-exit-status-alone": "admit",
       "vi4-fewer-collected": "admit",
       "vi4-no-tests": "admit",
