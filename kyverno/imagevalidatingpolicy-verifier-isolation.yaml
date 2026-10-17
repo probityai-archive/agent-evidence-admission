@@ -258,3 +258,32 @@ spec:
         has(variables.staging.special_files_rejected) && variables.staging.special_files_rejected == true
       message: "vi-6:special_files_admitted"
 
+    # -- vi-7  V7 Forgery ---------------------------------------------------------
+    - expression: >-
+        has(variables.report.evidence_from_worker)
+        && type(variables.report.evidence_from_worker) == list
+        && size(variables.report.evidence_from_worker) == 0
+      message: "vi-7:evidence_taken_from_worker"
+    - expression: >-
+        has(variables.worker.env_scrubbed) && variables.worker.env_scrubbed == true
+      message: "vi-7:environment_not_scrubbed"
+    - expression: >-
+        has(variables.worker.scratch_copy) && variables.worker.scratch_copy == true
+      message: "vi-7:no_scratch_copy"
+
+    # -- vi-8  V8 Disclosure ------------------------------------------------------
+    - expression: >-
+        has(variables.reference.dir_mode) && type(variables.reference.dir_mode) == string
+        && variables.reference.dir_mode.matches("^0?[0-7]00$")
+      message: "vi-8:reference_readable_by_worker"
+    - expression: >-
+        has(variables.reference.inside_artifact_dir) && variables.reference.inside_artifact_dir == false
+      message: "vi-8:reference_inside_artifact"
+
+    # -- vi-9  V9 Exploit ---------------------------------------------------------
+    - expression: >-
+        has(variables.report.loaders) && type(variables.report.loaders) == list
+        && size(variables.report.loaders) > 0
+      message: "vi-9:loaders_undeclared"
+    - expression: size(variables.unsafeLoaders) == 0
+      messageExpression: "'vi-9:unsafe_loader:' + variables.unsafeLoaders.join(',')"

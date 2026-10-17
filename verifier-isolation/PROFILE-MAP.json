@@ -4,7 +4,7 @@
     "agree": {
       "cue": 8,
       "cue-policy-controller": 7,
-      "kyverno-cel": 38
+      "kyverno-cel": 49
     },
     "policy_controller_gap": [
       "report-missing"
@@ -209,34 +209,34 @@
           "vectors_opening": 4
         },
         "vi-7": {
-          "disposition": "unreachable",
-          "obstruction": "no-refusal-rule",
-          "rules": [],
-          "rules_missing": [
+          "disposition": "enforced",
+          "rules": [
             "vi-7:environment_not_scrubbed",
             "vi-7:evidence_taken_from_worker",
             "vi-7:no_scratch_copy"
           ],
+          "rules_deleted": 3,
+          "rules_surviving": 0,
           "vectors_opening": 5
         },
         "vi-8": {
-          "disposition": "unreachable",
-          "obstruction": "no-refusal-rule",
-          "rules": [],
-          "rules_missing": [
+          "disposition": "enforced",
+          "rules": [
             "vi-8:reference_inside_artifact",
             "vi-8:reference_readable_by_worker"
           ],
+          "rules_deleted": 2,
+          "rules_surviving": 0,
           "vectors_opening": 4
         },
         "vi-9": {
-          "disposition": "unreachable",
-          "obstruction": "no-refusal-rule",
-          "rules": [],
-          "rules_missing": [
+          "disposition": "enforced",
+          "rules": [
             "vi-9:loaders_undeclared",
             "vi-9:unsafe_loader"
           ],
+          "rules_deleted": 2,
+          "rules_surviving": 0,
           "vectors_opening": 5
         }
       }
@@ -531,17 +531,17 @@
       "vi6-destination-kept": "refuse",
       "vi6-links-followed": "refuse",
       "vi6-special-files": "refuse",
-      "vi7-env-not-scrubbed": "admit",
-      "vi7-no-scratch-copy": "admit",
-      "vi7-worker-evidence": "admit",
-      "vi7-worker-evidence-undeclared": "admit",
-      "vi8-reference-in-artifact": "admit",
-      "vi8-reference-readable": "admit",
-      "vi8-reference-undeclared": "admit",
-      "vi9-loader-safe-undeclared": "admit",
-      "vi9-no-loaders": "admit",
-      "vi9-unnamed-unsafe-loader": "admit",
-      "vi9-unsafe-loader": "admit"
+      "vi7-env-not-scrubbed": "refuse",
+      "vi7-no-scratch-copy": "refuse",
+      "vi7-worker-evidence": "refuse",
+      "vi7-worker-evidence-undeclared": "refuse",
+      "vi8-reference-in-artifact": "refuse",
+      "vi8-reference-readable": "refuse",
+      "vi8-reference-undeclared": "refuse",
+      "vi9-loader-safe-undeclared": "refuse",
+      "vi9-no-loaders": "refuse",
+      "vi9-unnamed-unsafe-loader": "refuse",
+      "vi9-unsafe-loader": "refuse"
     },
     "rego": {
       "baseline-admitted": "admit",
