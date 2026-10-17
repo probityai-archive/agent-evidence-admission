@@ -27,6 +27,7 @@ docs/DESIGN.md states that ceiling in full.
 - [Adversarial ratchet](https://github.com/probityai/agent-evidence-admission/blob/main/docs/ADVERSARIAL-RATCHET.md): The open adversarial-mutation findings against these rails, derived by `scripts/ratchet_report.py`.
 - [Provenance](https://github.com/probityai/agent-evidence-admission/blob/main/PROVENANCE.md): Per lifted file, where it came from, at which commit, and the SHA-256 of the source bytes.
 - [Agent change admission](https://github.com/probityai/agent-evidence-admission/blob/main/docs/AGENT-CHANGE-ADMISSION.md): A second rule set that admits an agent harness version only on a signed decision that admitted it, on OPA, Kyverno CEL and policy-controller, with its vectors and conformance driver.
+- [Verifier isolation](https://github.com/probityai/agent-evidence-admission/blob/main/docs/VERIFIER-ISOLATION.md): A third rule set that refuses a done verdict whose verifier left one of the nine reward-tampering vectors of terminal-bench issue 2086 open, on OPA, with its registry, vectors and conformance driver.
 - [Conformance harness](https://github.com/probityai/agent-evidence-admission/blob/main/conformance/run_policy_conformance.py): Runs every rail over the corpus projection and refuses an undeclared divergence from the oracle.
 
 ## Rails

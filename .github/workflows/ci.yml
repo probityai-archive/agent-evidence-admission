@@ -198,6 +198,33 @@ jobs:
       - name: every rail agrees on every vector and every refusal rule is load-bearing
         run: python3 conformance/run_change_admission_conformance.py
 
+  verifier-isolation:
+    # The verifier isolation rule set: one rego module, held to a vector file and a registry of
+    # nine obligations. The vectors and their tests regenerate byte for byte, the module answers
+    # every vector with the reasons it declares, deleting any single refusal rule turns the
+    # module's tests red, and the committed measurement and the rendered registry equal a fresh run.
+    name: verifier isolation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: install opa
+        run: |
+          set -euo pipefail
+          curl -sSfL -o /tmp/opa \
+            "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64_static"
+          echo "${OPA_SHA256}  /tmp/opa" | sha256sum -c -
+          chmod +x /tmp/opa
+          sudo mv /tmp/opa /usr/local/bin/opa
+      - name: the vectors and their tests are what the generator writes
+        run: python3 rego/gen_verifier_isolation_vectors.py --check
+      - name: the module's own tests
+        run: opa test --timeout 300s rego/verifier_isolation.rego rego/verifier_isolation_test.rego rego/verifier_isolation_vectors.json
+      - name: every obligation is measured and every refusal rule is load-bearing
+        run: python3 conformance/run_verifier_isolation_conformance.py
+      - name: the profile registry renders the family
+        run: python3 scripts/gen_profile_registry.py --check
+
   rails:
     name: every rail over the pinned corpus
     runs-on: ubuntu-latest

@@ -1,0 +1,149 @@
+{
+  "artifact": "rego/verifier_isolation.rego",
+  "family": "verifier-isolation",
+  "obligations": {
+    "vi-1": {
+      "disposition": "enforced",
+      "hardening": [],
+      "name": "Overwrite",
+      "rules": [
+        "vi-1:excluded_names_not_reset",
+        "vi-1:trusted_tree_not_reset_to_contract"
+      ],
+      "rules_deleted": 2,
+      "rules_surviving": 0,
+      "vector": "V1",
+      "vectors_opening": 4
+    },
+    "vi-2": {
+      "disposition": "enforced",
+      "hardening": [
+        "H2",
+        "H4"
+      ],
+      "name": "Patch",
+      "rules": [
+        "vi-2:assertions_not_in_parent",
+        "vi-2:trusted_python_not_isolated",
+        "vi-2:worker_not_unprivileged",
+        "vi-2:worker_supplementary_groups_kept"
+      ],
+      "rules_deleted": 4,
+      "rules_surviving": 0,
+      "vector": "V2",
+      "vectors_opening": 9
+    },
+    "vi-3": {
+      "disposition": "enforced",
+      "hardening": [
+        "H1"
+      ],
+      "name": "Reward",
+      "rules": [
+        "vi-3:result_dir_open_to_worker",
+        "vi-3:result_not_precleared",
+        "vi-3:result_not_written_by_verifier",
+        "vi-3:result_source_ambiguous"
+      ],
+      "rules_deleted": 4,
+      "rules_surviving": 0,
+      "vector": "V3",
+      "vectors_opening": 8
+    },
+    "vi-4": {
+      "disposition": "enforced",
+      "hardening": [
+        "H7"
+      ],
+      "name": "Fail-open",
+      "rules": [
+        "vi-4:no_tests_expected",
+        "vi-4:test_count_mismatch",
+        "vi-4:tests_skipped",
+        "vi-4:verdict_from_exit_status_alone"
+      ],
+      "rules_deleted": 4,
+      "rules_surviving": 0,
+      "vector": "V4",
+      "vectors_opening": 6
+    },
+    "vi-5": {
+      "disposition": "enforced",
+      "hardening": [
+        "H5"
+      ],
+      "name": "Sleeper",
+      "rules": [
+        "vi-5:result_read_before_kill",
+        "vi-5:worker_processes_not_killed",
+        "vi-5:worker_processes_remain"
+      ],
+      "rules_deleted": 3,
+      "rules_surviving": 0,
+      "vector": "V5",
+      "vectors_opening": 5
+    },
+    "vi-6": {
+      "disposition": "enforced",
+      "hardening": [
+        "H6"
+      ],
+      "name": "Staging",
+      "rules": [
+        "vi-6:destination_not_removed_first",
+        "vi-6:links_followed",
+        "vi-6:special_files_admitted"
+      ],
+      "rules_deleted": 3,
+      "rules_surviving": 0,
+      "vector": "V6",
+      "vectors_opening": 4
+    },
+    "vi-7": {
+      "disposition": "enforced",
+      "hardening": [
+        "H2"
+      ],
+      "name": "Forgery",
+      "rules": [
+        "vi-7:environment_not_scrubbed",
+        "vi-7:evidence_taken_from_worker",
+        "vi-7:no_scratch_copy"
+      ],
+      "rules_deleted": 3,
+      "rules_surviving": 0,
+      "vector": "V7",
+      "vectors_opening": 5
+    },
+    "vi-8": {
+      "disposition": "enforced",
+      "hardening": [
+        "H3"
+      ],
+      "name": "Disclosure",
+      "rules": [
+        "vi-8:reference_inside_artifact",
+        "vi-8:reference_readable_by_worker"
+      ],
+      "rules_deleted": 2,
+      "rules_surviving": 0,
+      "vector": "V8",
+      "vectors_opening": 4
+    },
+    "vi-9": {
+      "disposition": "enforced",
+      "hardening": [],
+      "name": "Exploit",
+      "rules": [
+        "vi-9:loaders_undeclared",
+        "vi-9:unsafe_loader:%s"
+      ],
+      "rules_deleted": 2,
+      "rules_surviving": 0,
+      "vector": "V9",
+      "vectors_opening": 5
+    }
+  },
+  "rail": "rego",
+  "vectors": 49
+}

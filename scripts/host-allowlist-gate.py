@@ -45,6 +45,8 @@ ALLOWED_HOSTS = frozenset(
         # the predicate and its home
         "in-toto.io",
         "github.com",
+        # the host the done receipt predicate type is minted on
+        "probityai.github.io",
         "raw.githubusercontent.com",
         "doi.org",
         "orcid.org",
