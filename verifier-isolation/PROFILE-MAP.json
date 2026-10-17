@@ -1,149 +1,598 @@
 {
-  "artifact": "rego/verifier_isolation.rego",
+  "cross_rail": {
+    "admitted": 3,
+    "agree": {
+      "cue": 8,
+      "cue-policy-controller": 7,
+      "kyverno-cel": 8
+    },
+    "policy_controller_gap": [
+      "report-missing"
+    ],
+    "reference": "rego under the pins an engine gives it: the signature checked, and the contract pin the vector carries",
+    "refused": 46,
+    "vectors": 49
+  },
   "family": "verifier-isolation",
-  "obligations": {
-    "vi-1": {
-      "disposition": "enforced",
-      "hardening": [],
-      "name": "Overwrite",
-      "rules": [
-        "vi-1:excluded_names_not_reset",
-        "vi-1:trusted_tree_not_reset_to_contract"
-      ],
-      "rules_deleted": 2,
-      "rules_surviving": 0,
-      "vector": "V1",
-      "vectors_opening": 4
+  "rails": {
+    "cue": {
+      "artifact": "policy-controller/clusterimagepolicy-verifier-isolation-cue.yaml",
+      "obligations": {
+        "vi-1": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-1:excluded_names_not_reset",
+            "vi-1:trusted_tree_not_reset_to_contract"
+          ],
+          "vectors_opening": 4
+        },
+        "vi-2": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-2:assertions_not_in_parent",
+            "vi-2:trusted_python_not_isolated",
+            "vi-2:worker_not_unprivileged",
+            "vi-2:worker_supplementary_groups_kept"
+          ],
+          "vectors_opening": 9
+        },
+        "vi-3": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-3:result_dir_open_to_worker",
+            "vi-3:result_not_precleared",
+            "vi-3:result_not_written_by_verifier",
+            "vi-3:result_source_ambiguous"
+          ],
+          "vectors_opening": 8
+        },
+        "vi-4": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-4:no_tests_expected",
+            "vi-4:test_count_mismatch",
+            "vi-4:tests_skipped",
+            "vi-4:verdict_from_exit_status_alone"
+          ],
+          "vectors_opening": 6
+        },
+        "vi-5": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-5:result_read_before_kill",
+            "vi-5:worker_processes_not_killed",
+            "vi-5:worker_processes_remain"
+          ],
+          "vectors_opening": 5
+        },
+        "vi-6": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-6:destination_not_removed_first",
+            "vi-6:links_followed",
+            "vi-6:special_files_admitted"
+          ],
+          "vectors_opening": 4
+        },
+        "vi-7": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-7:environment_not_scrubbed",
+            "vi-7:evidence_taken_from_worker",
+            "vi-7:no_scratch_copy"
+          ],
+          "vectors_opening": 5
+        },
+        "vi-8": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-8:reference_inside_artifact",
+            "vi-8:reference_readable_by_worker"
+          ],
+          "vectors_opening": 4
+        },
+        "vi-9": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "refused_as_policy_controller_reads_it": 0,
+          "refused_by_cue_vet": 1,
+          "rules": [],
+          "rules_missing": [
+            "vi-9:loaders_undeclared",
+            "vi-9:unsafe_loader"
+          ],
+          "vectors_opening": 5
+        }
+      }
     },
-    "vi-2": {
-      "disposition": "enforced",
-      "hardening": [
-        "H2",
-        "H4"
-      ],
-      "name": "Patch",
-      "rules": [
-        "vi-2:assertions_not_in_parent",
-        "vi-2:trusted_python_not_isolated",
-        "vi-2:worker_not_unprivileged",
-        "vi-2:worker_supplementary_groups_kept"
-      ],
-      "rules_deleted": 4,
-      "rules_surviving": 0,
-      "vector": "V2",
-      "vectors_opening": 9
+    "kyverno-cel": {
+      "artifact": "kyverno/imagevalidatingpolicy-verifier-isolation.yaml",
+      "obligations": {
+        "vi-1": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-1:excluded_names_not_reset",
+            "vi-1:trusted_tree_not_reset_to_contract"
+          ],
+          "vectors_opening": 4
+        },
+        "vi-2": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-2:assertions_not_in_parent",
+            "vi-2:trusted_python_not_isolated",
+            "vi-2:worker_not_unprivileged",
+            "vi-2:worker_supplementary_groups_kept"
+          ],
+          "vectors_opening": 9
+        },
+        "vi-3": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-3:result_dir_open_to_worker",
+            "vi-3:result_not_precleared",
+            "vi-3:result_not_written_by_verifier",
+            "vi-3:result_source_ambiguous"
+          ],
+          "vectors_opening": 8
+        },
+        "vi-4": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-4:no_tests_expected",
+            "vi-4:test_count_mismatch",
+            "vi-4:tests_skipped",
+            "vi-4:verdict_from_exit_status_alone"
+          ],
+          "vectors_opening": 6
+        },
+        "vi-5": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-5:result_read_before_kill",
+            "vi-5:worker_processes_not_killed",
+            "vi-5:worker_processes_remain"
+          ],
+          "vectors_opening": 5
+        },
+        "vi-6": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-6:destination_not_removed_first",
+            "vi-6:links_followed",
+            "vi-6:special_files_admitted"
+          ],
+          "vectors_opening": 4
+        },
+        "vi-7": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-7:environment_not_scrubbed",
+            "vi-7:evidence_taken_from_worker",
+            "vi-7:no_scratch_copy"
+          ],
+          "vectors_opening": 5
+        },
+        "vi-8": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-8:reference_inside_artifact",
+            "vi-8:reference_readable_by_worker"
+          ],
+          "vectors_opening": 4
+        },
+        "vi-9": {
+          "disposition": "unreachable",
+          "obstruction": "no-refusal-rule",
+          "rules": [],
+          "rules_missing": [
+            "vi-9:loaders_undeclared",
+            "vi-9:unsafe_loader"
+          ],
+          "vectors_opening": 5
+        }
+      }
     },
-    "vi-3": {
-      "disposition": "enforced",
-      "hardening": [
-        "H1"
-      ],
-      "name": "Reward",
-      "rules": [
-        "vi-3:result_dir_open_to_worker",
-        "vi-3:result_not_precleared",
-        "vi-3:result_not_written_by_verifier",
-        "vi-3:result_source_ambiguous"
-      ],
-      "rules_deleted": 4,
-      "rules_surviving": 0,
-      "vector": "V3",
-      "vectors_opening": 8
-    },
-    "vi-4": {
-      "disposition": "enforced",
-      "hardening": [
-        "H7"
-      ],
-      "name": "Fail-open",
-      "rules": [
-        "vi-4:no_tests_expected",
-        "vi-4:test_count_mismatch",
-        "vi-4:tests_skipped",
-        "vi-4:verdict_from_exit_status_alone"
-      ],
-      "rules_deleted": 4,
-      "rules_surviving": 0,
-      "vector": "V4",
-      "vectors_opening": 6
-    },
-    "vi-5": {
-      "disposition": "enforced",
-      "hardening": [
-        "H5"
-      ],
-      "name": "Sleeper",
-      "rules": [
-        "vi-5:result_read_before_kill",
-        "vi-5:worker_processes_not_killed",
-        "vi-5:worker_processes_remain"
-      ],
-      "rules_deleted": 3,
-      "rules_surviving": 0,
-      "vector": "V5",
-      "vectors_opening": 5
-    },
-    "vi-6": {
-      "disposition": "enforced",
-      "hardening": [
-        "H6"
-      ],
-      "name": "Staging",
-      "rules": [
-        "vi-6:destination_not_removed_first",
-        "vi-6:links_followed",
-        "vi-6:special_files_admitted"
-      ],
-      "rules_deleted": 3,
-      "rules_surviving": 0,
-      "vector": "V6",
-      "vectors_opening": 4
-    },
-    "vi-7": {
-      "disposition": "enforced",
-      "hardening": [
-        "H2"
-      ],
-      "name": "Forgery",
-      "rules": [
-        "vi-7:environment_not_scrubbed",
-        "vi-7:evidence_taken_from_worker",
-        "vi-7:no_scratch_copy"
-      ],
-      "rules_deleted": 3,
-      "rules_surviving": 0,
-      "vector": "V7",
-      "vectors_opening": 5
-    },
-    "vi-8": {
-      "disposition": "enforced",
-      "hardening": [
-        "H3"
-      ],
-      "name": "Disclosure",
-      "rules": [
-        "vi-8:reference_inside_artifact",
-        "vi-8:reference_readable_by_worker"
-      ],
-      "rules_deleted": 2,
-      "rules_surviving": 0,
-      "vector": "V8",
-      "vectors_opening": 4
-    },
-    "vi-9": {
-      "disposition": "enforced",
-      "hardening": [],
-      "name": "Exploit",
-      "rules": [
-        "vi-9:loaders_undeclared",
-        "vi-9:unsafe_loader:%s"
-      ],
-      "rules_deleted": 2,
-      "rules_surviving": 0,
-      "vector": "V9",
-      "vectors_opening": 5
+    "rego": {
+      "artifact": "rego/verifier_isolation.rego",
+      "obligations": {
+        "vi-1": {
+          "disposition": "enforced",
+          "hardening": [],
+          "name": "Overwrite",
+          "rules": [
+            "vi-1:excluded_names_not_reset",
+            "vi-1:trusted_tree_not_reset_to_contract"
+          ],
+          "rules_deleted": 2,
+          "rules_surviving": 0,
+          "vector": "V1",
+          "vectors_opening": 4
+        },
+        "vi-2": {
+          "disposition": "enforced",
+          "hardening": [
+            "H2",
+            "H4"
+          ],
+          "name": "Patch",
+          "rules": [
+            "vi-2:assertions_not_in_parent",
+            "vi-2:trusted_python_not_isolated",
+            "vi-2:worker_not_unprivileged",
+            "vi-2:worker_supplementary_groups_kept"
+          ],
+          "rules_deleted": 4,
+          "rules_surviving": 0,
+          "vector": "V2",
+          "vectors_opening": 9
+        },
+        "vi-3": {
+          "disposition": "enforced",
+          "hardening": [
+            "H1"
+          ],
+          "name": "Reward",
+          "rules": [
+            "vi-3:result_dir_open_to_worker",
+            "vi-3:result_not_precleared",
+            "vi-3:result_not_written_by_verifier",
+            "vi-3:result_source_ambiguous"
+          ],
+          "rules_deleted": 4,
+          "rules_surviving": 0,
+          "vector": "V3",
+          "vectors_opening": 8
+        },
+        "vi-4": {
+          "disposition": "enforced",
+          "hardening": [
+            "H7"
+          ],
+          "name": "Fail-open",
+          "rules": [
+            "vi-4:no_tests_expected",
+            "vi-4:test_count_mismatch",
+            "vi-4:tests_skipped",
+            "vi-4:verdict_from_exit_status_alone"
+          ],
+          "rules_deleted": 4,
+          "rules_surviving": 0,
+          "vector": "V4",
+          "vectors_opening": 6
+        },
+        "vi-5": {
+          "disposition": "enforced",
+          "hardening": [
+            "H5"
+          ],
+          "name": "Sleeper",
+          "rules": [
+            "vi-5:result_read_before_kill",
+            "vi-5:worker_processes_not_killed",
+            "vi-5:worker_processes_remain"
+          ],
+          "rules_deleted": 3,
+          "rules_surviving": 0,
+          "vector": "V5",
+          "vectors_opening": 5
+        },
+        "vi-6": {
+          "disposition": "enforced",
+          "hardening": [
+            "H6"
+          ],
+          "name": "Staging",
+          "rules": [
+            "vi-6:destination_not_removed_first",
+            "vi-6:links_followed",
+            "vi-6:special_files_admitted"
+          ],
+          "rules_deleted": 3,
+          "rules_surviving": 0,
+          "vector": "V6",
+          "vectors_opening": 4
+        },
+        "vi-7": {
+          "disposition": "enforced",
+          "hardening": [
+            "H2"
+          ],
+          "name": "Forgery",
+          "rules": [
+            "vi-7:environment_not_scrubbed",
+            "vi-7:evidence_taken_from_worker",
+            "vi-7:no_scratch_copy"
+          ],
+          "rules_deleted": 3,
+          "rules_surviving": 0,
+          "vector": "V7",
+          "vectors_opening": 5
+        },
+        "vi-8": {
+          "disposition": "enforced",
+          "hardening": [
+            "H3"
+          ],
+          "name": "Disclosure",
+          "rules": [
+            "vi-8:reference_inside_artifact",
+            "vi-8:reference_readable_by_worker"
+          ],
+          "rules_deleted": 2,
+          "rules_surviving": 0,
+          "vector": "V8",
+          "vectors_opening": 4
+        },
+        "vi-9": {
+          "disposition": "enforced",
+          "hardening": [],
+          "name": "Exploit",
+          "rules": [
+            "vi-9:loaders_undeclared",
+            "vi-9:unsafe_loader:%s"
+          ],
+          "rules_deleted": 2,
+          "rules_surviving": 0,
+          "vector": "V9",
+          "vectors_opening": 5
+        }
+      }
     }
   },
-  "rail": "rego",
-  "vectors": 49
+  "vectors": 49,
+  "verdicts": {
+    "cue": {
+      "baseline-admitted": "admit",
+      "contract-digest-invalid": "refuse",
+      "contract-pin-matches": "admit",
+      "contract-pin-mismatch": "refuse",
+      "predicate-type-wrong": "refuse",
+      "report-missing": "refuse",
+      "signature-undeclared": "admit",
+      "statement-type-wrong": "refuse",
+      "vi1-excluded-names-kept": "admit",
+      "vi1-trusted-tree-differs": "admit",
+      "vi1-trusted-tree-undeclared": "admit",
+      "vi2-assertions-with-submission": "admit",
+      "vi2-flag-is-string": "admit",
+      "vi2-groups-kept": "admit",
+      "vi2-groups-undeclared": "admit",
+      "vi2-python-not-isolated": "admit",
+      "vi2-worker-is-root": "admit",
+      "vi2-worker-is-verifier": "admit",
+      "vi2-worker-uid-string": "admit",
+      "vi3-no-source": "admit",
+      "vi3-not-precleared": "admit",
+      "vi3-result-dir-777": "admit",
+      "vi3-result-dir-group": "admit",
+      "vi3-result-dir-undeclared": "admit",
+      "vi3-two-sources": "admit",
+      "vi3-written-by-worker": "admit",
+      "vi4-exit-status-alone": "admit",
+      "vi4-fewer-collected": "admit",
+      "vi4-no-tests": "admit",
+      "vi4-skipped": "admit",
+      "vi4-skipped-undeclared": "admit",
+      "vi5-not-killed": "admit",
+      "vi5-read-before-kill": "admit",
+      "vi5-remaining": "admit",
+      "vi5-steps-equal": "admit",
+      "vi6-destination-kept": "admit",
+      "vi6-links-followed": "admit",
+      "vi6-special-files": "admit",
+      "vi7-env-not-scrubbed": "admit",
+      "vi7-no-scratch-copy": "admit",
+      "vi7-worker-evidence": "admit",
+      "vi7-worker-evidence-undeclared": "admit",
+      "vi8-reference-in-artifact": "admit",
+      "vi8-reference-readable": "admit",
+      "vi8-reference-undeclared": "admit",
+      "vi9-loader-safe-undeclared": "admit",
+      "vi9-no-loaders": "admit",
+      "vi9-unnamed-unsafe-loader": "admit",
+      "vi9-unsafe-loader": "admit"
+    },
+    "cue-policy-controller": {
+      "baseline-admitted": "admit",
+      "contract-digest-invalid": "refuse",
+      "contract-pin-matches": "admit",
+      "contract-pin-mismatch": "refuse",
+      "predicate-type-wrong": "refuse",
+      "report-missing": "admit",
+      "signature-undeclared": "admit",
+      "statement-type-wrong": "refuse",
+      "vi1-excluded-names-kept": "admit",
+      "vi1-trusted-tree-differs": "admit",
+      "vi1-trusted-tree-undeclared": "admit",
+      "vi2-assertions-with-submission": "admit",
+      "vi2-flag-is-string": "admit",
+      "vi2-groups-kept": "admit",
+      "vi2-groups-undeclared": "admit",
+      "vi2-python-not-isolated": "admit",
+      "vi2-worker-is-root": "admit",
+      "vi2-worker-is-verifier": "admit",
+      "vi2-worker-uid-string": "admit",
+      "vi3-no-source": "admit",
+      "vi3-not-precleared": "admit",
+      "vi3-result-dir-777": "admit",
+      "vi3-result-dir-group": "admit",
+      "vi3-result-dir-undeclared": "admit",
+      "vi3-two-sources": "admit",
+      "vi3-written-by-worker": "admit",
+      "vi4-exit-status-alone": "admit",
+      "vi4-fewer-collected": "admit",
+      "vi4-no-tests": "admit",
+      "vi4-skipped": "admit",
+      "vi4-skipped-undeclared": "admit",
+      "vi5-not-killed": "admit",
+      "vi5-read-before-kill": "admit",
+      "vi5-remaining": "admit",
+      "vi5-steps-equal": "admit",
+      "vi6-destination-kept": "admit",
+      "vi6-links-followed": "admit",
+      "vi6-special-files": "admit",
+      "vi7-env-not-scrubbed": "admit",
+      "vi7-no-scratch-copy": "admit",
+      "vi7-worker-evidence": "admit",
+      "vi7-worker-evidence-undeclared": "admit",
+      "vi8-reference-in-artifact": "admit",
+      "vi8-reference-readable": "admit",
+      "vi8-reference-undeclared": "admit",
+      "vi9-loader-safe-undeclared": "admit",
+      "vi9-no-loaders": "admit",
+      "vi9-unnamed-unsafe-loader": "admit",
+      "vi9-unsafe-loader": "admit"
+    },
+    "kyverno-cel": {
+      "baseline-admitted": "admit",
+      "contract-digest-invalid": "refuse",
+      "contract-pin-matches": "admit",
+      "contract-pin-mismatch": "refuse",
+      "predicate-type-wrong": "refuse",
+      "report-missing": "refuse",
+      "signature-undeclared": "admit",
+      "statement-type-wrong": "refuse",
+      "vi1-excluded-names-kept": "admit",
+      "vi1-trusted-tree-differs": "admit",
+      "vi1-trusted-tree-undeclared": "admit",
+      "vi2-assertions-with-submission": "admit",
+      "vi2-flag-is-string": "admit",
+      "vi2-groups-kept": "admit",
+      "vi2-groups-undeclared": "admit",
+      "vi2-python-not-isolated": "admit",
+      "vi2-worker-is-root": "admit",
+      "vi2-worker-is-verifier": "admit",
+      "vi2-worker-uid-string": "admit",
+      "vi3-no-source": "admit",
+      "vi3-not-precleared": "admit",
+      "vi3-result-dir-777": "admit",
+      "vi3-result-dir-group": "admit",
+      "vi3-result-dir-undeclared": "admit",
+      "vi3-two-sources": "admit",
+      "vi3-written-by-worker": "admit",
+      "vi4-exit-status-alone": "admit",
+      "vi4-fewer-collected": "admit",
+      "vi4-no-tests": "admit",
+      "vi4-skipped": "admit",
+      "vi4-skipped-undeclared": "admit",
+      "vi5-not-killed": "admit",
+      "vi5-read-before-kill": "admit",
+      "vi5-remaining": "admit",
+      "vi5-steps-equal": "admit",
+      "vi6-destination-kept": "admit",
+      "vi6-links-followed": "admit",
+      "vi6-special-files": "admit",
+      "vi7-env-not-scrubbed": "admit",
+      "vi7-no-scratch-copy": "admit",
+      "vi7-worker-evidence": "admit",
+      "vi7-worker-evidence-undeclared": "admit",
+      "vi8-reference-in-artifact": "admit",
+      "vi8-reference-readable": "admit",
+      "vi8-reference-undeclared": "admit",
+      "vi9-loader-safe-undeclared": "admit",
+      "vi9-no-loaders": "admit",
+      "vi9-unnamed-unsafe-loader": "admit",
+      "vi9-unsafe-loader": "admit"
+    },
+    "rego": {
+      "baseline-admitted": "admit",
+      "contract-digest-invalid": "refuse",
+      "contract-pin-matches": "admit",
+      "contract-pin-mismatch": "refuse",
+      "predicate-type-wrong": "refuse",
+      "report-missing": "refuse",
+      "signature-undeclared": "admit",
+      "statement-type-wrong": "refuse",
+      "vi1-excluded-names-kept": "refuse",
+      "vi1-trusted-tree-differs": "refuse",
+      "vi1-trusted-tree-undeclared": "refuse",
+      "vi2-assertions-with-submission": "refuse",
+      "vi2-flag-is-string": "refuse",
+      "vi2-groups-kept": "refuse",
+      "vi2-groups-undeclared": "refuse",
+      "vi2-python-not-isolated": "refuse",
+      "vi2-worker-is-root": "refuse",
+      "vi2-worker-is-verifier": "refuse",
+      "vi2-worker-uid-string": "refuse",
+      "vi3-no-source": "refuse",
+      "vi3-not-precleared": "refuse",
+      "vi3-result-dir-777": "refuse",
+      "vi3-result-dir-group": "refuse",
+      "vi3-result-dir-undeclared": "refuse",
+      "vi3-two-sources": "refuse",
+      "vi3-written-by-worker": "refuse",
+      "vi4-exit-status-alone": "refuse",
+      "vi4-fewer-collected": "refuse",
+      "vi4-no-tests": "refuse",
+      "vi4-skipped": "refuse",
+      "vi4-skipped-undeclared": "refuse",
+      "vi5-not-killed": "refuse",
+      "vi5-read-before-kill": "refuse",
+      "vi5-remaining": "refuse",
+      "vi5-steps-equal": "refuse",
+      "vi6-destination-kept": "refuse",
+      "vi6-links-followed": "refuse",
+      "vi6-special-files": "refuse",
+      "vi7-env-not-scrubbed": "refuse",
+      "vi7-no-scratch-copy": "refuse",
+      "vi7-worker-evidence": "refuse",
+      "vi7-worker-evidence-undeclared": "refuse",
+      "vi8-reference-in-artifact": "refuse",
+      "vi8-reference-readable": "refuse",
+      "vi8-reference-undeclared": "refuse",
+      "vi9-loader-safe-undeclared": "refuse",
+      "vi9-no-loaders": "refuse",
+      "vi9-unnamed-unsafe-loader": "refuse",
+      "vi9-unsafe-loader": "refuse"
+    }
+  }
 }

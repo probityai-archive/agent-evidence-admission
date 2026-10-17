@@ -1,0 +1,67 @@
+# Verifier isolation, on sigstore policy-controller's CUE rail.
+#
+# Admit a Pod only when its image carries a done-receipt attestation, signed by the authority key
+# below, whose isolation report closes the reward-tampering vectors of terminal-bench issue 2086
+# that CUE can state about an absent fact, and the rest of them as far as it can. The rego module
+# `../rego/verifier_isolation.rego` is the reference for every constraint here, and
+# `../conformance/run_verifier_isolation_conformance.py` drives the same vectors through both. A
+# trailing `// rule: <reason>` names the rego reason a line stands for; the harness deletes each
+# marked line in turn and requires a vector that only that reason refuses to start passing.
+#
+# !!! THIS MANIFEST DENIES EVERY POD UNTIL YOU PIN TWO VALUES !!!
+#   1. the receipt issuer's public key under `authorities[].key.data`;
+#   2. the contract digest this deployment grades against, the `PIN-ME-` literal marked
+#      `contract_digest_mismatch`. To decline the comparison, delete that line.
+#
+# WHAT THIS RAIL DOES NOT DO, MEASURED. The family fails closed on a fact that is absent. CUE under
+# policy-controller cannot. cosign compiles the policy with CompileString, unifies it with the
+# statement and calls Validate() with neither Final nor Concrete (pkg/policy/eval.go, evaluateCue),
+# so a member the statement omits is not an error: the policy's own constraint fills it, and a
+# report that omits `worker.supplementary_groups` or the whole `verifier_isolation` member is
+# admitted. The `!` markers below make `cue vet` refuse the omitted form, and they are kept
+# because they are correct and take effect under any evaluator that finalises. Under cosign's
+# reading a WRONG value is still a conflict and is refused; an ABSENT one is not.
+# `conformance/run_verifier_isolation_conformance.py` runs every vector both ways, `cue vet` and
+# `cue eval` (which unifies and reports conflicts only), names the vectors the second admits, and
+# records each obligation they open as `unreachable (absent-member-not-denied)`. A deployment that needs the omitted form refused
+# deploys the Kyverno CEL or the rego rail instead. cosign itself is not executed in this
+# repository.
+#
+# WHAT NEITHER ESTABLISHES: that the report is true. It is the verifier's account of itself.
+apiVersion: policy.sigstore.dev/v1alpha1
+kind: ClusterImagePolicy
+metadata:
+  name: require-verifier-isolation-cue
+spec:
+  mode: enforce
+  images:
+    - glob: "**"
+  authorities:
+    - name: receipt-issuer-key
+      key:
+        data: |
+          -----BEGIN PUBLIC KEY-----
+          PIN-ME-REPLACE-WITH-THE-RECEIPT-ISSUER-PUBLIC-KEY
+          -----END PUBLIC KEY-----
+      attestations:
+        - name: must-close-every-isolation-vector
+          predicateType: "https://probityai.github.io/probity/predicate/v1/done-receipt"
+          policy:
+            type: cue
+            data: |
+              // The statement. `_type` is quoted because an unquoted name that starts with an
+              // underscore is a hidden field in CUE and would never meet the statement's member.
+              "_type": "https://in-toto.io/Statement/v1" // rule: unsupported_statement_type
+              predicateType: "https://probityai.github.io/probity/predicate/v1/done-receipt" // rule: unsupported_predicate
+              predicate: verifier_isolation!: {} // rule: isolation_report_missing
+              predicate: verifier_isolation!: contract_sha256!: =~"^[0-9a-f]{64}$" // rule: contract_digest_invalid
+              predicate: verifier_isolation!: contract_sha256!: "PIN-ME-REPLACE-WITH-THE-CONTRACT-DIGEST" // rule: contract_digest_mismatch
+
+
+
+
+
+
+
+
+

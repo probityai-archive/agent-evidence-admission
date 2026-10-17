@@ -10,6 +10,9 @@ comes from a rail's PROFILE-MAP.json, which is measured.
     scripts/gen_profile_registry.py
     scripts/gen_profile_registry.py --check
 
+The README's one sentence about how many verifier isolation obligations each rail enforces sits
+between two HTML comments and is filled from the same map, so it cannot be typed by hand.
+
 Exit codes:
     0  written, or under --check the file matches what this renders
     1  under --check, the file is stale
@@ -29,6 +32,9 @@ PROFILES = HERE / "profiles"
 OUT = HERE / "PROFILE-REGISTRY.md"
 FAMILY_REGISTRY = HERE / "registry" / "verifier-isolation.json"
 FAMILY_MAP = HERE / "verifier-isolation" / "PROFILE-MAP.json"
+README = HERE / "README.md"
+README_OPEN = "<!-- vi-enforced -->"
+README_CLOSE = "<!-- /vi-enforced -->"
 
 MARK = {"enforced": "enforced", "approximated": "approx", "unreachable": "unreachable"}
 
@@ -146,18 +152,25 @@ def render() -> str:
     return "\n".join(lines)
 
 
+def cell(row: dict) -> str:
+    if row["disposition"] == "enforced":
+        return f"enforced ({len(row['rules'])} rules, {row['vectors_opening']} vectors)"
+    return f"unreachable ({row.get('obstruction', 'unnamed')})"
+
+
 def render_family() -> list[str]:
-    """The verifier isolation family: nine obligations from a second source, one rail."""
+    """The verifier isolation family: nine obligations from a second source, measured on three rails."""
     for path in (FAMILY_REGISTRY, FAMILY_MAP):
         if not path.is_file():
             cannot(f"missing {path}")
     family = json.loads(FAMILY_REGISTRY.read_text(encoding="utf-8"))
     measured = json.loads(FAMILY_MAP.read_text(encoding="utf-8"))
-    rows = measured["obligations"]
+    rails = sorted(measured["rails"])
+    cross = measured["cross_rail"]
     out: list[str] = []
     out.append("\n## The verifier isolation family\n")
     out.append(
-        f"{len(family['obligations'])} obligations, one rail. These are not conditions of the "
+        f"{len(family['obligations'])} obligations, {len(rails)} rails. These are not conditions of the "
         f"adversarial-execution-evidence corpus above. Each closes one reward-tampering vector of "
         f"[terminal-bench issue 2086]({family['source']['url']}), and the family has its own "
         f"registry (`registry/verifier-isolation.json`), vectors "
@@ -166,23 +179,54 @@ def render_family() -> list[str]:
         f"`conformance/run_verifier_isolation_conformance.py`). "
         f"[docs/VERIFIER-ISOLATION.md](docs/VERIFIER-ISOLATION.md) says what a report must carry.\n"
     )
+    agree = cross["agree"]
+    n = measured["vectors"]
+    same = "on all" if agree["kyverno-cel"] == agree["cue"] == n else f"on {agree['kyverno-cel']} and {agree['cue']} of"
     out.append(
-        "The `rego` rail is the only rail. The Kyverno and CUE rails do not carry this family, "
-        "and a disposition for a rail that is not here would be a claim nothing measured.\n"
+        f"The `rego` rail is the reference. The `kyverno-cel` and `cue` rails answer the same {n} vectors "
+        f"and give the reference's verdict {same} {n}"
+        + ("" if same.startswith("on all") else " respectively")
+        + f". The `cue` column is `cue vet`. policy-controller's CUE evaluator leaves an absent member "
+        f"incomplete instead of failing it, admits {len(cross['policy_controller_gap'])} vectors that "
+        f"`cue vet` refuses, and agrees with the reference on {agree['cue-policy-controller']} of {n}. "
+        f"Every obligation is open to a report that omits its fact, so no obligation is `enforced` on the "
+        f"`cue` rail. The reason is in [docs/VERIFIER-ISOLATION.md](docs/VERIFIER-ISOLATION.md#the-cue-gap).\n"
     )
-    out.append("| obligation | vector | hardening | what it closes | `rego` |")
-    out.append("|---|---|---|---|---|")
+    out.append("| rail | enforced | unreachable |")
+    out.append("|---|---|---|")
+    for rail in rails:
+        rows = measured["rails"][rail]["obligations"].values()
+        enforced = sum(1 for r in rows if r["disposition"] == "enforced")
+        out.append(f"| `{rail}` | {enforced} | {len(rows) - enforced} |")
+    out.append("")
+    out.append("| obligation | vector | hardening | what it closes | " + " | ".join(f"`{r}`" for r in rails) + " |")
+    out.append("|---|---|---|---|" + "---|" * len(rails))
     for ob in family["obligations"]:
-        row = rows[ob["id"]]
-        mark = row["disposition"]
-        if mark == "enforced":
-            mark = f"enforced ({len(row['rules'])} rules, {row['vectors_opening']} vectors)"
-        else:
-            mark = f"{mark} ({row.get('obstruction', 'unnamed')})"
         steps = ", ".join(ob["hardening"]) or "none"
-        out.append(f"| `{ob['id']}` | {ob['vector']} {ob['name']} | {steps} | {ob['closes']} | {mark} |")
+        cells = [cell(measured["rails"][r]["obligations"][ob["id"]]) for r in rails]
+        out.append(f"| `{ob['id']}` | {ob['vector']} {ob['name']} | {steps} | {ob['closes']} | " + " | ".join(cells) + " |")
     out.append("")
     return out
+
+
+def readme_fragment() -> str:
+    """The sentence the README carries about how many verifier isolation obligations each rail enforces."""
+    measured = json.loads(FAMILY_MAP.read_text(encoding="utf-8"))
+    parts = []
+    for rail in sorted(measured["rails"]):
+        rows = measured["rails"][rail]["obligations"].values()
+        enforced = sum(1 for r in rows if r["disposition"] == "enforced")
+        parts.append(f"`{rail}` {enforced} of {len(rows)}")
+    return "enforced: " + ", ".join(parts)
+
+
+def render_readme() -> str:
+    text = README.read_text(encoding="utf-8")
+    if README_OPEN not in text or README_CLOSE not in text:
+        cannot(f"{README.name} has no {README_OPEN} ... {README_CLOSE} span to fill")
+    head, rest = text.split(README_OPEN, 1)
+    _, tail = rest.split(README_CLOSE, 1)
+    return head + README_OPEN + readme_fragment() + README_CLOSE + tail
 
 
 def main(argv: list[str]) -> int:
@@ -190,6 +234,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv[1:])
     rendered = render()
+    readme = render_readme()
     if args.check:
         if not OUT.is_file():
             print(f"{OUT} does not exist", file=sys.stderr)
@@ -197,10 +242,14 @@ def main(argv: list[str]) -> int:
         if OUT.read_text(encoding="utf-8") != rendered:
             print(f"{OUT} is stale against the registry and the maps", file=sys.stderr)
             return 1
-        print("check: PROFILE-REGISTRY.md is current")
+        if README.read_text(encoding="utf-8") != readme:
+            print(f"{README.name} states a verifier isolation count the map does not support", file=sys.stderr)
+            return 1
+        print("check: PROFILE-REGISTRY.md and the README count are current")
         return 0
     OUT.write_text(rendered, encoding="utf-8")
-    print(f"wrote {OUT.relative_to(HERE)}")
+    README.write_text(readme, encoding="utf-8")
+    print(f"wrote {OUT.relative_to(HERE)} and the count in {README.name}")
     return 0
 
 
