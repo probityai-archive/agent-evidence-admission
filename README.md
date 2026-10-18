@@ -1,3 +1,6 @@
+<!-- moved-to-monorepo -->
+> **Moved to [github.com/probityai/agent-evidence/packages/admission](https://github.com/probityai/agent-evidence/tree/main/packages/admission).** This repository is archived. Its tags, releases, Actions and Pages keep working.
+
 # agent-evidence-admission
 
 Admission checks for artifact bytes and workload evidence: a Python digest checker plus OPA,
