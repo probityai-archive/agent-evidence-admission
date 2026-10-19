@@ -1,5 +1,5 @@
 <!-- moved-to-monorepo -->
-> **Moved to [github.com/probityai/agent-evidence/packages/admission](https://github.com/probityai/agent-evidence/tree/main/packages/admission).** This repository is archived. Its tags, releases, Actions and Pages keep working.
+> **Moved to [probityai/agent-evidence/packages/admission](https://github.com/probityai/agent-evidence/tree/main/packages/admission). Star and follow it there.** This repository is archived; its tags and releases keep working.
 
 # agent-evidence-admission
 
